@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="style.css">
+<script src="https://kit.fontawesome.com/a81b7bf18d.js" crossorigin="anonymous"></script>
+<body>
+    <button id="find-me" class="find-me">Show my location</button>
+<p id="status"></p>
+<a id="map-link" target="_blank"></a>
+
+<div class="container">
+    <div class="box1">
+      <div class="place">LONDON</div>
+      <div class="date">Fri, July 21</div>
+      <div class="temperature"><div class="header"><img src="./images/REALcloud.png" alt=""></div><div class="tempe"></div></div>
+        <div class="weather">
+          
+          <div class="text1">6' feels like 5 '</div>
+           <div class="text2"> Partially Cloudy
+          </div>
+
+        </div>
+        
+        
+   </div>
+    <div class="box2">
+      <ul class="table1">
+        <li class="humidity"><div class="header1"><img src="./images/humidity (4).png" alt="">
+
+        </div>Humidity <div class="txt1"> 89</div></li>
+        <li class="pressure"><div class="header1"><img src="./images/pressure-gauge (1).png" alt=""></div>Pressure<div class="txt2"> 89</div></li>
+        <li class="windspeed"><div class="header1"><img src="./images/storm.png" alt=""></div>WindSpeed<div class="txt3"> 89</div></li>
+        <li class="winddirection"><div class="header1"><img src="./images/wind-sign.png" alt=""></div>Wind Direcion<div class="txt4"> 89</div></li>
+        <li class="visibility"><div class="header1"><img src="./images/witness (1).png" alt=""></div>Visibility<div class="txt5"> 89</div></li>
+        <li class="timezone"><div class="header1"><img src="./images/time (2).png" alt=""></div>Timezone<div class="txt6"> 89</div></li>
+        </ul>
+        
+    </div>
+  </div>
+
+    
+   <script>
+    let latitude;
+    let longitude;
+function geoFindMe() {
+  const status = document.querySelector("#status");
+  const mapLink = document.querySelector("#map-link");
+
+  mapLink.href = "";
+  
+
+  function success(position) {
+     latitude = position.coords.latitude;
+     longitude = position.coords.longitude;
+
+   
+    mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+   
+    fetchlocation();
+  }
+
+  function error() {
+    status.textContent = "Unable to retrieve your location";
+  }
+
+  if (!navigator.geolocation) {
+    status.textContent = "Geolocation is not supported by your browser";
+  } else {
+    
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+}
+
+document.querySelector("#find-me").addEventListener("click", geoFindMe);
+
+async function fetchlocation(){
+        const url =`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=b1cbb0e42dbcee9dd96e1e121e603a9f`;
+        fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        // ... Rest of the code ...
+        const d = new Date();
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+document.querySelector(" .place").innerHTML=data.name;
+document.querySelector(" .date").innerHTML=`${d.toLocaleDateString("en-US", options)}`;
+const temp1 =data.main.temp;
+const tempmin =data.main.temp_min-273.15;
+const tempmax =data.main.temp_max-273.15;
+const tempfeel =data.main.feels_like-273.15;
+let cel =temp1 - 273.15;
+let temperature =parseFloat(cel.toFixed(0));
+const temp_min=parseFloat(tempmin.toFixed(0));
+const temp_max=parseFloat(tempmax.toFixed(0));
+const feels_like=parseFloat(tempfeel.toFixed(0));
+document.querySelector(" .tempe").innerHTML=`${temperature}°`;
+document.querySelector(" .text1").innerHTML=`${temp_min}°/${temp_max}° Feels like ${feels_like}°`;
+
+document.querySelector(" .text2").innerHTML=data.weather[0].description;
+document.querySelector(" .txt1").innerHTML=data.main.humidity;
+document.querySelector(" .txt2").innerHTML=data.main.pressure;
+document.querySelector(" .txt3").innerHTML=data.wind.speed;
+document.querySelector(" .txt4").innerHTML=`${data.wind.deg}°`;
+document.querySelector(" .txt5").innerHTML=data.visibility;
+document.querySelector(" .txt6").innerHTML=data.timezone;
+      })
+      .catch(error => {
+        console.error("Error fetching weather data:", error);
+        // You can add error handling here, like showing an error message to the user.
+      });
+
+
+
+    }
+    
+
+
+   </script> 
+</body>
+</html>
